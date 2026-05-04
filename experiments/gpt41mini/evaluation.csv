@@ -1,0 +1,6 @@
+test_prompt,agent_response_excerpt,intent_resolution,relevance,groundedness,depth,comments
+day-hike-gear,"For summer day hikes: sturdy footwear, hydration, sun protection, navigation, first aid...",4,4,4,3,Good coverage but less detailed than GPT-4.1
+overnight-camping,"First overnight camping: shelter, sleep system, cooking gear, water filter, lighting...",4,4,4,3,Solid advice, slightly less nuanced
+three-day-backpacking,"October mountain safety: weather monitoring, layered clothing, navigation tools, bear protocols...",4,4,4,4,Good safety guidance, concise
+winter-hiking,"Winter hiking essentials: insulation layers, traction devices, avalanche gear, emergency shelter...",4,4,4,3,Clear comparison, adequate detail
+trail-difficulty,"Beginner trail assessment: difficulty ratings, elevation metrics, terrain types, backup planning...",4,4,4,4,Practical framework provided
