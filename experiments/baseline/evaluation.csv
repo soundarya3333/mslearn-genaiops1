@@ -1,0 +1,6 @@
+test_prompt,agent_response_excerpt,intent_resolution,relevance,groundedness,comments
+day-hike-gear,"Essential gear items for a summer day hike... lightweight hiking boots, moisture-wicking layers, hydration...",5,5,4,Clear and comprehensive gear list with good organization
+overnight-camping,"Congratulations on taking your first step toward an overnight camping adventure... assess experience, check weather...",4,4,5,Good beginner advice with strong safety focus
+three-day-backpacking,"A 3-day mountain backpacking trip in October requires heightened safety awareness... weather risks, daylight, hypothermia...",5,5,5,Excellent detailed safety guidance for October conditions
+winter-hiking,"For winter hiking, demands are significantly higher... insulation layers, traction devices, avalanche gear...",4,4,4,Thorough comparison of seasonal differences with practical advice
+trail-difficulty,"Selecting the right trail is crucial... difficulty ratings, elevation gain, terrain assessment...",5,5,5,Helpful framework with specific metrics for beginners
