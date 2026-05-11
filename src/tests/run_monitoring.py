@@ -1,10 +1,13 @@
-"""Run all test prompts against trail guide prompt versions (v1, v2, v3)
-with Application Insights monitoring and distributed tracing.
+"""Run all test prompts against trail guide prompt versions (v1, v2, v3, v4)
+with Application Insights and Foundry tracing enabled.
 
-This script:
-1. Connects Application Insights for telemetry collection
-2. Loads prompt versions v1, v2, v3 from the prompts directory
-3. Runs all test prompts against each version using direct chat completions
+This script uses Foundry's AI Project client so that requests are visible
+in the Foundry portal (Tracing, Resource Usage, etc.), not just in Log Analytics.
+
+It:
+1. Gets an OpenAI-compatible client routed through Foundry's API gateway
+2. Loads prompt versions from the prompts directory
+3. Runs all test prompts against each version
 4. Wraps each version in a named trace span for side-by-side comparison
 5. Captures token usage, latency, and response data per prompt
 """
@@ -14,56 +17,48 @@ import time
 import uuid
 from pathlib import Path
 from dotenv import load_dotenv
-from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from azure.identity import DefaultAzureCredential
 from azure.ai.projects import AIProjectClient
-from openai import AzureOpenAI
 from azure.monitor.opentelemetry import configure_azure_monitor
 from opentelemetry import trace
-from opentelemetry.instrumentation.openai_v2 import OpenAIInstrumentor
 
 # Load environment variables from .env file
 load_dotenv()
 
 project_endpoint = os.environ["AZURE_AI_PROJECT_ENDPOINT"]
-openai_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
 model_name = os.getenv("MODEL_NAME", "gpt-4.1")
 
-# Connect to Azure AI Project and retrieve Application Insights connection string
+# Connect to Azure AI Project
 project_client = AIProjectClient(
     endpoint=project_endpoint,
     credential=DefaultAzureCredential(),
 )
+
+# Get the Azure OpenAI client routed through Foundry's API gateway.
+# This ensures token usage and traces are visible in Foundry's portal.
+chat_client = project_client.get_openai_client()
+
+# Retrieve the Application Insights connection string provisioned alongside the project
 connection_string = project_client.telemetry.get_application_insights_connection_string()
 print(f"[DEBUG] Connection string: {connection_string}")
 
-# Set as env var so all SDK components can discover it automatically
 os.environ["APPLICATIONINSIGHTS_CONNECTION_STRING"] = connection_string
-
 configure_azure_monitor(connection_string=connection_string)
-OpenAIInstrumentor().instrument()
 
 tracer = trace.get_tracer(__name__)
-
-token_provider = get_bearer_token_provider(
-    DefaultAzureCredential(),
-    "https://cognitiveservices.azure.com/.default",
-)
-chat_client = AzureOpenAI(
-    azure_endpoint=openai_endpoint,
-    azure_ad_token_provider=token_provider,
-    api_version="2024-10-21",
-)
 
 # Paths to prompt versions and test prompts
 PROMPTS_DIR = Path(__file__).parent.parent / "agents" / "trail_guide_agent" / "prompts"
 TEST_PROMPTS_DIR = Path(__file__).parent / "test-prompts"
 
 # Prompt versions to compare
-VERSIONS = ["v1", "v2", "v3"]
+VERSIONS = ["v1", "v2", "v3", "v4_optimized_concise"]
 
 
 def load_prompt(version: str) -> str:
     """Load a prompt version from the prompts directory."""
+    if version == "v4_optimized_concise":
+        return (PROMPTS_DIR / f"{version}.txt").read_text().strip()
     return (PROMPTS_DIR / f"{version}_instructions.txt").read_text().strip()
 
 
