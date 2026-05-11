@@ -21,6 +21,7 @@ from azure.identity import DefaultAzureCredential
 from azure.ai.projects import AIProjectClient
 from azure.monitor.opentelemetry import configure_azure_monitor
 from opentelemetry import trace
+from opentelemetry.instrumentation.openai_v2 import OpenAIInstrumentor
 
 # Load environment variables from .env file
 load_dotenv()
@@ -44,6 +45,7 @@ print(f"[DEBUG] Connection string: {connection_string}")
 
 os.environ["APPLICATIONINSIGHTS_CONNECTION_STRING"] = connection_string
 configure_azure_monitor(connection_string=connection_string)
+OpenAIInstrumentor().instrument()
 
 tracer = trace.get_tracer(__name__)
 
